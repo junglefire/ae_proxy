@@ -1,0 +1,10 @@
+{
+	"udp.proxy": {
+		"self.ip": "127.0.0.1",
+		"self.port": 4444
+	},
+	"tcp.proxy": {
+		"self.ip": "127.0.0.1",
+		"self.port": 4444
+	}
+}

@@ -1,0 +1,7 @@
+digraph tcp_server {
+	listen [label="tcp_server::listen()"]
+	on_accept [label="tcp_client::on_accept()"]
+	on_message [label="tcp_client::on_message()"]
+
+	listen->on_accept->on_message;
+}

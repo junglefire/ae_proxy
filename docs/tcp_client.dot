@@ -1,0 +1,13 @@
+digraph tcp_client {
+	connect [label="tcp_client::connect()"]
+	connect_cb_ok [label="tcp_client::run_connect_callback(Success)"]
+	connect_cb_failed [label="tcp_client::run_connect_callback(Fail)"]
+	write [label="tcp_client::write()"]
+
+	main->connect;
+	connect->uv_tcp_connect;
+	uv_tcp_connect->on_connect;
+	on_connect->connect_cb_ok [label="Success"];
+	on_connect->connect_cb_failed [label="Fail"];
+	connect_cb_ok->write
+}
