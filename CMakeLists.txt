@@ -2,10 +2,16 @@ PROJECT(smart_proxy)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 
-ADD_DEFINITIONS(-DDETAIL_MESSAGE)
-# ADD_DEFINITIONS(-DSIMPLE_MESSAGE)
-ADD_DEFINITIONS(-w)
-
+IF(WIN32)
+	ADD_DEFINITIONS(-DWIN32_MESSAGE)
+	ADD_COMPILE_OPTIONS(/W4)
+	ADD_COMPILE_OPTIONS(/wd4100)
+	ADD_COMPILE_OPTIONS(/wd4244)
+ELSE()
+	ADD_DEFINITIONS(-DDETAIL_MESSAGE)
+	# ADD_DEFINITIONS(-DSIMPLE_MESSAGE)
+	ADD_DEFINITIONS(-w)
+ENDIF()
 
 SET(CMAKE_C_FLAGS_DEBUG "-O0 -Wall -g -ggdb")
 SET(CMAKE_C_FLAGS_RELEASE "-O3 -Wall")
@@ -39,9 +45,9 @@ ADD_LIBRARY(ae ${AE})
 ###########################   application  ####################################
 ###############################################################################
 
-SET(SMARTPROXY app/main.cpp app/udp_proxy.cpp app/udp_agent.cpp app/tcp_proxy.cpp)
-ADD_EXECUTABLE(smart_proxy ${SMARTPROXY})
-TARGET_LINK_LIBRARIES(smart_proxy ae uv msgpackc)
+# SET(SMARTPROXY app/main.cpp app/udp_proxy.cpp app/udp_agent.cpp app/tcp_proxy.cpp)
+# ADD_EXECUTABLE(smart_proxy ${SMARTPROXY})
+# TARGET_LINK_LIBRARIES(smart_proxy ae uv msgpackc)
 
 
 
@@ -49,25 +55,25 @@ TARGET_LINK_LIBRARIES(smart_proxy ae uv msgpackc)
 ##############################   test  ########################################
 ###############################################################################
 
-SET(TCPCLIENT tests/test_tcp_client.cpp)
-ADD_EXECUTABLE(test_tcp_client ${TCPCLIENT})
-TARGET_LINK_LIBRARIES(test_tcp_client ae uv)
+# SET(TCPCLIENT tests/test_tcp_client.cpp)
+# ADD_EXECUTABLE(test_tcp_client ${TCPCLIENT})
+# TARGET_LINK_LIBRARIES(test_tcp_client ae uv)
 
-SET(TCPSERVER tests/test_tcp_server.cpp)
-ADD_EXECUTABLE(test_tcp_server ${TCPSERVER})
-TARGET_LINK_LIBRARIES(test_tcp_server ae uv)
+# SET(TCPSERVER tests/test_tcp_server.cpp)
+# ADD_EXECUTABLE(test_tcp_server ${TCPSERVER})
+# TARGET_LINK_LIBRARIES(test_tcp_server ae uv)
 
-SET(UDPSERVER tests/test_udp_server.cpp)
-ADD_EXECUTABLE(test_udp_server ${UDPSERVER})
-TARGET_LINK_LIBRARIES(test_udp_server ae uv)
+# SET(UDPSERVER tests/test_udp_server.cpp)
+# ADD_EXECUTABLE(test_udp_server ${UDPSERVER})
+# TARGET_LINK_LIBRARIES(test_udp_server ae uv)
 
 SET(UDPCLIENT tests/test_udp_client.cpp)
 ADD_EXECUTABLE(test_udp_client ${UDPCLIENT})
 TARGET_LINK_LIBRARIES(test_udp_client ae uv msgpackc)
 
-SET(MSGPACK tests/test_msgpack.cpp)
-ADD_EXECUTABLE(test_msgpack ${MSGPACK})
-TARGET_LINK_LIBRARIES(test_msgpack msgpackc)
+# SET(MSGPACK tests/test_msgpack.cpp)
+# ADD_EXECUTABLE(test_msgpack ${MSGPACK})
+# TARGET_LINK_LIBRARIES(test_msgpack msgpackc)
 
 
 

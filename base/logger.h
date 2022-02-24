@@ -5,7 +5,7 @@
     #include <string.h>
 #endif
 
-#include <strings.h>
+//#include <strings.h>
 #include <stdio.h>
 
 /*
@@ -73,6 +73,22 @@ inline void hex_print(unsigned char* c, int len, char* pipe) {
     #define _info dzlog_info
     #define _debug dzlog_debug
     #define _error dzlog_error
+
+#elif defined WIN32_MESSAGE
+    #define _info(fmt, ...) \
+    do {\
+        fprintf(stderr, "[info][%s:%d:%s()] " fmt "\n", __FILENAME__, __LINE__, __func__, __VA_ARGS__);\
+    } while(0)
+
+    #define _debug(fmt,...) \
+    do {\
+        if (DEBUG_LEVEL) fprintf(stderr, "[debug][%s:%d:%s()] " fmt "\n", __FILENAME__, __LINE__, __func__, __VA_ARGS__);\
+    } while(0)
+
+    #define _error(fmt, ...) \
+    do {\
+        fprintf(stderr, "[error][%s:%d:%s()] " fmt "\n", __FILENAME__, __LINE__, __func__, __VA_ARGS__);\
+    } while(0)
 #endif 
 
 #endif//GEN_PROXY_LOGGER_H__
