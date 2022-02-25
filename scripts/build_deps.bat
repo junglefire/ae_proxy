@@ -34,6 +34,7 @@ if not exist %PKG_DIR% (
 set UV_VERSION=1.42.0
 set MSGPACK_VERSION=4.0.0
 set ZLOG_VERSION=1.2.15
+set CXXOPTS_VERSION=3.0.0
 
 if "%1" == "libuv" (
 	:: build libuv
@@ -73,6 +74,18 @@ if "%1" == "libuv" (
 	cmake .. -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%
 	cd ..
 	cmake --build build --target INSTALL
+) else if "%1" == "cxxopts" (
+	:: build cxxopts
+	echo ">>>>>--------> build cxxopts ..."
+	if not exist %PKG_DIR%\cxxopts-%CXXOPTS_VERSION%.tar.gz (
+		wget https://github.com/jarro2783/cxxopts/archive/refs/tags/v%CXXOPTS_VERSION%.tar.gz --output-document=%PKG_DIR%/cxxopts-%CXXOPTS_VERSION%.tar.gz
+	)
+	cd %PKG_DIR%
+	tar -zxvf cxxopts-%CXXOPTS_VERSION%.tar.gz
+	:: make
+	cd cxxopts-%CXXOPTS_VERSION%
+	echo copy header file...
+	copy include\cxxopts.hpp %INSTALL_DIR%\include
 ) else (
 	echo unsupported package!
 )
