@@ -19,6 +19,7 @@ using namespace smart;
 #define MSG_LEN 	5
 
 int main(int argc, char* argv[]) {
+	printf("run...");
 	ParseResult args;
 	Options options("test_udp_client", "Libuv udp client test app");
 

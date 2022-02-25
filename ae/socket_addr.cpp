@@ -78,11 +78,24 @@ void SocketAddr::addr_to_str(uv_tcp_t* client, std::string& addrStr, IPV ipv) {
 uint16_t SocketAddr::get_ip_and_port(const sockaddr_storage* addr, std::string& out, IPV ipv) {
 	auto inet = (Ipv6 == ipv) ? AF_INET6 : AF_INET;
 	if (Ipv6 == ipv) {
-		char ip[64];
-		struct sockaddr_in6* addr6 = (struct sockaddr_in6 *)addr;
-		std::string str(inet_ntop(inet, (void *)&(addr6->sin6_addr), ip, 64));
-		out.swap(str);
-		return(htons(addr6->sin6_port));
+        char ip[64];
+        struct sockaddr_in6* addr6 = (struct sockaddr_in6 *)addr;
+        //低版本windows可能找不到inet_ntop函数。
+#if defined WIN32_MSVC
+        DWORD size = sizeof(ip);
+        WSAAddressToString((LPSOCKADDR)addr6, sizeof(sockaddr_in6), NULL, ip, &size);
+        out = std::string(ip);
+        auto index = out.rfind(":");
+        if (index >= 0)
+        {
+            out.resize(index);
+        }
+        return (htons(addr6->sin6_port));
+#else
+        std::string str(inet_ntop(inet, (void *)&(addr6->sin6_addr), ip, 64));
+        out.swap(str);
+        return(htons(addr6->sin6_port));
+#endif
 	} else {
 		struct sockaddr_in *addr4 = (struct sockaddr_in *)addr;
 		std::string str(inet_ntoa(addr4->sin_addr));
