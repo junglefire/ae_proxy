@@ -72,7 +72,11 @@ ADD_LIBRARY(ae ${AE})
 
 SET(UDPCLIENT tests/test_udp_client.cpp)
 ADD_EXECUTABLE(test_udp_client ${UDPCLIENT})
-TARGET_LINK_LIBRARIES(test_udp_client ae uv_a msgpackc Ws2_32 Iphlpapi Userenv Psapi)
+IF(WIN32)
+	TARGET_LINK_LIBRARIES(test_udp_client ae uv_a msgpackc Ws2_32 Iphlpapi Userenv Psapi)
+ELSE()
+	TARGET_LINK_LIBRARIES(test_udp_client ae uv msgpackc)
+ENDIF()
 
 # SET(MSGPACK tests/test_msgpack.cpp)
 # ADD_EXECUTABLE(test_msgpack ${MSGPACK})
