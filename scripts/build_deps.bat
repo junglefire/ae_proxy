@@ -18,6 +18,7 @@ if "%1" == "" (
 	echo   - msgpack
 	echo   - json
 	echo   - cxxopts
+	echo   - sqlite3
 	exit -1
 )
 
@@ -35,6 +36,7 @@ set UV_VERSION=1.42.0
 set MSGPACK_VERSION=4.0.0
 set ZLOG_VERSION=1.2.15
 set CXXOPTS_VERSION=3.0.0
+set SQLITE3_VERSION=3380000
 
 if "%1" == "libuv" (
 	:: build libuv
@@ -86,6 +88,18 @@ if "%1" == "libuv" (
 	cd cxxopts-%CXXOPTS_VERSION%
 	echo copy header file...
 	copy include\cxxopts.hpp %INSTALL_DIR%\include
+) else if "%1" == "sqlite3" (
+	:: build sqlite3
+	echo ">>>>>--------> build sqlite3 ..."
+	if not exist %PKG_DIR%\sqlite-autoconf-%SQLITE3_VERSION%.tar.gz (
+		wget https://sqlite.org/2022/sqlite-autoconf-%SQLITE3_VERSION%.tar.gz --output-document=%PKG_DIR%\sqlite-autoconf-%SQLITE3_VERSION%.tar.gz
+	)
+	cd %PKG_DIR%
+	tar -zxvf sqlite-autoconf-%SQLITE3_VERSION%.tar.gz
+	:: make
+	cd sqlite-autoconf-%SQLITE3_VERSION%
+	echo nmake...
+	nmake -f Makefile.msc
 ) else (
 	echo unsupported package!
 )
