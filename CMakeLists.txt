@@ -83,7 +83,9 @@ ENDIF()
 # TARGET_LINK_LIBRARIES(test_msgpack msgpackc)
 
 
-
+SET(FTS tests/test_fts.cpp)
+ADD_EXECUTABLE(test_fts ${FTS})
+TARGET_LINK_LIBRARIES(test_fts sqlite3.dll)
 
 
 

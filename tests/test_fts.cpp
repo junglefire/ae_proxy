@@ -9,6 +9,8 @@
 
 using namespace cxxopts;
 
+// #pragma comment(lib, "pkg/lib/sqlite3.lib")
+
 /*
  * 测试用SQL语句
  */

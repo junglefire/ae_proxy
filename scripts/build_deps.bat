@@ -36,7 +36,7 @@ set UV_VERSION=1.42.0
 set MSGPACK_VERSION=4.0.0
 set ZLOG_VERSION=1.2.15
 set CXXOPTS_VERSION=3.0.0
-set SQLITE3_VERSION=3380000
+set SQLITE3_VERSION=3.37.0
 
 if "%1" == "libuv" (
 	:: build libuv
@@ -88,18 +88,34 @@ if "%1" == "libuv" (
 	cd cxxopts-%CXXOPTS_VERSION%
 	echo copy header file...
 	copy include\cxxopts.hpp %INSTALL_DIR%\include
-) else if "%1" == "sqlite3" (
+) else if "%1" == "sqlite_old" (
 	:: build sqlite3
 	echo ">>>>>--------> build sqlite3 ..."
 	if not exist %PKG_DIR%\sqlite-autoconf-%SQLITE3_VERSION%.tar.gz (
 		wget https://sqlite.org/2022/sqlite-autoconf-%SQLITE3_VERSION%.tar.gz --output-document=%PKG_DIR%\sqlite-autoconf-%SQLITE3_VERSION%.tar.gz
 	)
 	cd %PKG_DIR%
-	tar -zxvf sqlite-autoconf-%SQLITE3_VERSION%.tar.gz
+	:: tar -zxvf sqlite-autoconf-%SQLITE3_VERSION%.tar.gz
 	:: make
 	cd sqlite-autoconf-%SQLITE3_VERSION%
 	echo nmake...
 	nmake -f Makefile.msc
+	:: copy header files and lib
+	echo copy header file...
+	copy sqlite3.h %INSTALL_DIR%\include
+	copy sqlite3ext.h %INSTALL_DIR%\include
+	echo copy library...
+	copy sqlite3.lib %INSTALL_DIR%\lib
+) else if "%1" == "sqlite3" (
+	:: build sqlite3
+	echo ">>>>>--------> build sqlite3 ..."
+	cd %PKG_DIR%
+	if not exist %PKG_DIR%\sqlite3-cmake-%SQLITE3_VERSION% (
+		git clone https://github.com/alex85k/sqlite3-cmake.git sqlite3-cmake-%SQLITE3_VERSION%
+	)
+	cd %PKG_DIR%\sqlite3-cmake-%SQLITE3_VERSION%
+	cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%
+	nmake install
 ) else (
 	echo unsupported package!
 )
