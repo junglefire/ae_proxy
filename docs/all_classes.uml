@@ -1,0 +1,214 @@
+@startuml
+
+
+
+class TcpClient {
+	+ void TcpClient(EventLoop * loop, bool tcpNoDelay)
+	+ void TcpClient()
+	+ bool is_tcp_no_delay()
+	+ void set_tcp_no_delay(bool isNoDelay)
+	+ void connect(SocketAddr & addr)
+	+ void close(TcpClientCloseCallback callback)
+	+ void set_connect_status_callback(ConnectStatusCallback callback)
+	+ void set_message_callback(NewMessageCallback callback)
+	+ int write(const char * buf, unsigned int size, AfterWriteCallback callback)
+	+ void write_in_loop(const char * buf, unsigned int size, AfterWriteCallback callback)
+	# void on_message(TcpConnection * connection, const char * buf, ssize_t size)
+	# void on_connect_close(std::string & name)
+	# void on_connect(bool success)
+	# void after_connect_fail()
+	- TcpConnection * connection_
+	- uv_connect_t * connect_
+	- SocketAddr::IPV ipv
+	- UVTcpPtr socket_
+	- bool tcpNoDelay_
+	- EventLoop * loop_
+	- ConnectStatusCallback connectCallback_
+	- NewMessageCallback onMessageCallback_
+}
+
+class TcpAcceptor {
+	+ void TcpAcceptor(EventLoop * loop, bool tcpNoDelay)
+	+ void TcpAcceptor()
+	+ int bind(SocketAddr & addr)
+	+ int listen()
+	+ bool is_listen()
+	+ void close(DefaultCallback callback)
+	+ bool is_tcp_no_delay()
+	+ void set_new_connection_callback(NewConnectionCallback callback)
+	+ EventLoop * loop()
+	- bool listened_
+	- bool tcpNoDelay_
+	- EventLoop * loop_
+	- NewConnectionCallback callback_
+	- DefaultCallback onCloseCompletCallback_
+	- uv_tcp_t server_
+}
+
+class TcpConnection {
+	+ void TcpConnection(EventLoop * loop, std::string & name, UVTcpPtr client, bool isConnected)
+	+ void TcpConnection()
+	+ void on_socket_close()
+	+ void close(std::function<void ( std::string & )> callback)
+	+ int write(const char * buf, ssize_t size, AfterWriteCallback callback)
+	+ void write_in_loop(const char * buf, ssize_t size, AfterWriteCallback callback)
+	+ void set_message_callback(OnMessageCallback callback)
+	+ void set_connect_close_callback(OnCloseCallback callback)
+	+ void set_connect_status(bool status)
+	+ bool is_connected()
+	+ const std::string & name()
+	- std::string name_
+	- bool connected_
+	- EventLoop * loop_
+	- UVTcpPtr handle_
+	- std::string data_
+	- PacketBufferPtr buffer_
+	- OnMessageCallback onMessageCallback_
+	- OnCloseCallback onConnectCloseCallback_
+	- CloseCompleteCallback closeCompleteCallback_
+}
+
+class TcpServer {
+	+ void TcpServer(EventLoop * loop, bool tcpNoDelay)
+	+ void TcpServer()
+	+ int listen(SocketAddr & addr)
+	+ void close(DefaultCallback callback)
+	+ TcpConnection * get_connection(const std::string & name)
+	+ void close_connection(const std::string & name)
+	+ void set_new_connect_callback(OnConnectionStatusCallback callback)
+	+ void set_connect_close_callback(OnConnectionStatusCallback callback)
+	+ void set_message_callback(OnMessageCallback callback)
+	+ void write(TcpConnection * connection, const char * buf, unsigned int size, AfterWriteCallback callback)
+	+ void write(std::string & name, const char * buf, unsigned int size, AfterWriteCallback callback)
+	+ void write_in_loop(TcpConnection * connection, const char * buf, unsigned int size, AfterWriteCallback callback)
+	+ void write_in_loop(std::string & name, const char * buf, unsigned int size, AfterWriteCallback callback)
+	+ void set_timeout(unsigned int )
+	- EventLoop * loop_
+	- bool tcpNoDelay_
+	- SocketAddr::IPV ipv_
+	- TcpAcceptor * accetper_
+	- std::map<std::string, TcpConnection * > connnections_
+	- OnMessageCallback onMessageCallback_
+	- OnConnectionStatusCallback onNewConnectCallback_
+	- OnConnectionStatusCallback onConnectCloseCallback_
+	- TimerWheel<TcpConnection * > timerWheel_
+}
+
+class EventLoop {
+	+ void EventLoop()
+	+ void EventLoop()
+	+ EventLoop * default_loop()
+	+ const char * get_error_message(int status)
+	+ int run()
+	+ int run_no_wait()
+	+ int stop()
+	+ bool is_stopped()
+	+ Status get_status()
+	+ bool is_run_in_loop_thread()
+	+ void run_in_this_loop(const DefaultCallback func)
+	+ uv_loop_t * handle()
+	- std::thread::id loopThreadId_
+	- uv_loop_t * loop_
+	- Async * async_
+	- std::atomic<Status > status_
+}
+
+class Packet {
+	+ void Packet()
+	+ void Packet()
+	+ void pack(const char * data, uint16_t size)
+	+ const char * get_data()
+	+ const uint16_t data_size()
+	+ const std::string & buffer()
+	+ const uint32_t packet_size()
+	+ void swap(std::string & str)
+	+ int read_from_buffer(PacketBuffer * , Packet &)
+	+ uint32_t packet_min_size()
+	+ void unpack_num(const uint8_t * data, NumType & num)
+	+ void pack_num(char * data, NumType num)
+	- std::string buffer_
+	- uint16_t dataSize_
+}
+
+class PacketBuffer {
+	+ void PacketBuffer()
+	+ void PacketBuffer()
+	+ int append(const char * data, uint64_t size)
+	+ int read_buffer_n(std::string & data, uint64_t N)
+	+ int clear_buffer_n(uint64_t N)
+	+ int clear()
+	+ uint64_t read_size()
+	+ int read_string(std::string & out)
+	+ int read_packet(Packet & out)
+	+ int read_generic(void * out)
+}
+
+class ListBuffer {
+	+ void ListBuffer()
+	+ void ListBuffer()
+	+ int append(const char * data, uint64_t size)
+	+ int read_buffer_n(std::string & data, uint64_t N)
+	+ uint64_t read_size()
+	+ int clear_buffer_n(uint64_t N)
+	+ int clear()
+	- std::list<uint8_t > buffer_
+}
+
+class SocketAddr {
+	+ void SocketAddr(const std::string & ip, unsigned short port, IPV ipv)
+	+ const sockaddr * addr()
+	+ void to_string(std::string & str)
+	+ std::string to_string()
+	+ std::size_t hash_code()
+	+ int port()
+	+ std::string ip()
+	+ IPV ipv()
+	+ void addr_to_str(uv_tcp_t * client, std::string & addrStr, IPV ipv)
+	+ uint16_t get_ip_and_port(const sockaddr_storage * addr, std::string & out, IPV ipv)
+	- std::string ip_
+	- unsigned short port_
+	- const IPV ipv_
+	- sockaddr_in ipv4_
+	- sockaddr_in6 ipv6_
+	- std::size_t hash_code_
+}
+
+class Timer {
+	+ void Timer(EventLoop * loop, uint64_t timeout, uint64_t repeat, TimerCallback callback)
+	+ void Timer()
+	+ void start()
+	+ void close(TimerCloseComplete callback)
+	+ void set_timer_repeat(uint64_t ms)
+	- bool started_
+	- uv_timer_t * handle_
+	- uint64_t timeout_
+	- uint64_t repeat_
+	- TimerCallback callback_
+	- TimerCloseComplete closeComplete_
+}
+
+class TimerWheel {
+	+ void TimerWheel(EventLoop * loop)
+	+ void TimerWheel(EventLoop * loop, unsigned int timeout)
+	+ void set_timeout(unsigned int seconds)
+	+ int get_timeout()
+	+ void start()
+	+ void insert(std::shared_ptr<T > value)
+	- unsigned int index_
+	- unsigned int timeoutSec_
+	- Timer timer_
+	- std::vector<std::set<std::shared_ptr<T> > > wheel_
+}
+
+
+PacketBuffer <|-- ListBuffer
+EventLoop <-- TcpClient
+TcpConnection <-- TcpClient
+EventLoop <-- TcpAcceptor
+EventLoop <-- TcpConnection
+TcpAcceptor <-- TcpServer
+EventLoop <-- TcpServer
+TcpConnection <-- TcpServer
+Timer <-- TimerWheel
+
+@enduml
